@@ -5,7 +5,8 @@ import {
   Icon,
   InputGroup,
   FormGroup,
-  Spinner
+  Spinner,
+  Switch
 } from '@blueprintjs/core';
 import * as React from 'react';
 import { useQuery, useMutation } from 'react-apollo';
@@ -42,6 +43,7 @@ const UpdateDatabaseCredentials = (): React.ReactElement => {
   const [owners, setOwners] = React.useState<string[]>([]);
   const [password, setPassword] = React.useState('');
   const [database, setDatabase] = React.useState('');
+  const [isServiceNameConn, setIsServiceNameConn] = React.useState(false);
   const [model, setModel] = React.useState(models[0]);
   const [hasChanged, setHasChanged] = React.useState(false);
   const [hasSuccessfullyChanged, setHasSuccessfullyChanged] = React.useState(
@@ -130,7 +132,7 @@ const UpdateDatabaseCredentials = (): React.ReactElement => {
       setLogin(login);
       setOwners(owners.map((o: Owner) => o.name));
       setPassword(password);
-      setDatabase(database);
+      setDatabase(database.split(':')[1] ?? database);
       setModel(model);
     }
   }, [loading, selectedNode, data]);
@@ -163,7 +165,7 @@ const UpdateDatabaseCredentials = (): React.ReactElement => {
               host,
               port,
               login,
-              database,
+              database: isServiceNameConn ? `service:${database}` : database,
               owners,
               password,
               model,
@@ -206,6 +208,12 @@ const UpdateDatabaseCredentials = (): React.ReactElement => {
               setHasChanged(true);
             }}
             placeholder={'Database name'}
+          />
+          <Switch
+            className="credential-field"
+            checked={isServiceNameConn}
+            label="use a service name"
+            onChange={(): void => setIsServiceNameConn(!isServiceNameConn)}
           />
         </FormGroup>
         <FormGroup label="Login">

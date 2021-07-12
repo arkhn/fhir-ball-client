@@ -4,8 +4,10 @@ import {
   FormGroup,
   InputGroup,
   HTMLSelect,
+  Switch,
   Icon
 } from '@blueprintjs/core';
+import { Tooltip2 } from '@blueprintjs/popover2';
 import axios from 'axios';
 import React, { useState } from 'react';
 import { useApolloClient, useQuery, useMutation } from '@apollo/react-hooks';
@@ -53,6 +55,8 @@ const NewSourceView = (): React.ReactElement => {
   const [owners, setOwners] = React.useState<string[]>([]);
   const [password, setPassword] = React.useState('');
   const [database, setDatabase] = React.useState('');
+  const [isServiceNameConn, setIsServiceNameConn] = React.useState(false);
+
   const [model, setModel] = React.useState(models[0]);
   const [availableOwners, setAvailableOwners] = React.useState(
     null as string[] | null
@@ -206,7 +210,7 @@ const NewSourceView = (): React.ReactElement => {
         host,
         port,
         login,
-        database,
+        database: isServiceNameConn ? `service:${database}` : database,
         owners,
         password,
         model,
@@ -267,6 +271,16 @@ const NewSourceView = (): React.ReactElement => {
     owners.splice(index, 1);
     setOwners([...owners]);
   };
+
+  const isServiceNameSwitch = (
+    <Tooltip2 content="use a service name" placement="top">
+      <Switch
+        className="switch"
+        checked={isServiceNameConn}
+        onChange={(): void => setIsServiceNameConn(!isServiceNameConn)}
+      />
+    </Tooltip2>
+  );
 
   return (
     <div>
@@ -374,6 +388,7 @@ const NewSourceView = (): React.ReactElement => {
                   setDatabase(event.target.value);
                 }}
                 placeholder={'Database name'}
+                rightElement={isServiceNameSwitch}
               />
               <InputGroup
                 className="credential-field"
